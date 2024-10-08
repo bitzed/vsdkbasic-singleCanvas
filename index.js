@@ -11,6 +11,8 @@ require('dotenv').config({ path: path.join(__dirname, '.env') })
 app.use(function(req, res, next) {
   res.header("Cross-Origin-Embedder-Policy", "require-corp")
   res.header("Cross-Origin-Opener-Policy", "same-origin")
+  //res.header("Cross-Origin-Embedder-Policy", false)
+  //res.header("Cross-Origin-Opener-Policy", false)
   next()
 })
 app.use(express.static(path.join(__dirname, 'public')))

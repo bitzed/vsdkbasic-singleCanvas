@@ -8,7 +8,9 @@ let videoDecode
 let videoEncode
 let audioDecode
 let audioEncode
-
+const canvas = document.getElementById('videoCanvas');
+const ctx = canvas.getContext('2d');
+const participants = new Map();
 ////////////////////////////////////////////////////////////////////////
 //
 document.addEventListener("DOMContentLoaded", function() {
@@ -23,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // CREATE VIDEO SDK CLIENT
 // INITIALIZE VIDEO SDK CLEINT
 // ADD LISTENER THEN JOIN
+
 
 async function joinSession() {
 
@@ -113,7 +116,7 @@ async function joinSession() {
     console.log("getCurrentUserInfo: ", n);
     console.log("get Session ID: ", sessionId);
     console.log("Connection Success");
-    cameraStartStop(); //automatically unmute camera when join
+    toggleNearVideo(); //automatically unmute camera when join
     audioStart(); //automatically start audio
   }).catch((error) => {
     console.log(error)
@@ -137,72 +140,80 @@ function leaveSession() {
 async function audioStart() {
   try{
     await stream.startAudio()
-    console.log(`${now()} audioStart`)
+    console.log(`audioStart`)
   } catch (e){
     console.log(e)
   }
 }
 
 //LOCAL CAMERA START STOP
-async function cameraStartStop() {
-
+async function toggleNearVideo() {
   let isVideoOn = await stream.isCapturingVideo()
-  console.log(Date(Date.now())+"cameraStartStop isCapturingVideo: " + isVideoOn)
-  let localVideoTrack = ZoomVideo.createLocalVideoTrack() // USED FOR DENDER SELF_VIDEO WITH VIDEO TAG
-  var n = client.getCurrentUserInfo()
-  console.log("getCurrentUserInfo: ", n)
-
-  var selfId = n.userId
-  console.log("selfId: ", selfId)
-
-  if(!isVideoOn){
-    toggleSelfVideo(stream,localVideoTrack, selfId, true)
+  console.log("[DEBUG]cameraStartStop isCapturingVideo: " + isVideoOn)  
+  var selfId = client.getCurrentUserInfo().userId;
+  console.log("[DEBUG]selfId: ", selfId)
+  if(isVideoOn){
+    stream.startVideo();
+    await stream.renderVideo(canvas, selfId, 320, 240, 0, 0, 2)
+      .then(() => {
+        updateCanvasLayout();
+      });
   }else{
-    toggleSelfVideo(stream,localVideoTrack, selfId, false)
+    await stream.stopRenderVideo(canvas, selfId);
+    isVideoOn = false
   }
-
 }
 
-
-//VIDEO TAG MODE TOGGLE NEAR END VIDEO ON VIDEO TAG
-const toggleSelfVideo = async (mediaStream,localVideoTrack, userId, isVideoOn) => {
-    let selfVideo = document.getElementById('self-video-videotag')
-    if (isVideoOn) {
-        console.log(Date(Date.now())+"toggleSelfVideo start")
-        await localVideoTrack.start(selfVideo)
-        await stream.startVideo({videoElement: selfVideo,hd:true}) 
-        //HD Trueを入れることで、最初からCaptureを720pに固定することが可能
-	isVideoOn = true
-        console.log(Date(Date.now())+"Near end video rendering started.")
-    } else {
-        console.log("toggleSelfVideo stop")
-        await localVideoTrack.stop()
-        await steam.stopVideo()
-        isVideoOn = false
-    }
-}
 
 //TOGGLE FAR END VIDEO ON CANVAS
-const toggleFarVideo = async (mediaStream, userId, isVideoOn) => {
-  var FAR_VIDEO_CANVAS = document.getElementById('far-video-canvas')
+const toggleFarVideo = async (stream, userId, isVideoOn) => {
     if (isVideoOn) {
-        await mediaStream.renderVideo(
-            FAR_VIDEO_CANVAS,
+        await stream.renderVideo(
+            canvas,
             userId,
-            1280,  // Size Width
-            720,  // Size Height
+            320,  // Size Width
+            240,  // Size Height
             0,      // Starting point x (Vertical : 横)
             0,     // Starting point y (Horizon : 縦)
-            3       // Video Quality 0:90p, 1:180p, 2:360p, 3:720p
-        )
-        console.log(Date(Date.now())+`${userId} video rendered.`)
+            2       // Video Quality 0:90p, 1:180p, 2:360p, 3:720p
+        ).then(() => {
+          participants.set(userId, {x:0,y:0,width:320,height:240});
+          updateCanvasLayout();
+        });
+        console.log(`${userId} video rendered.`)
     } else {
-        await mediaStream.stopRenderVideo(FAR_VIDEO_CANVAS, userId)
-        await mediaStream.clearVideoCanvas(FAR_VIDEO_CANVAS, userId)
-        console.log(Date(Date.now())+`${userId} video removed.`)
+        await stream.stopRenderVideo(canvas, userId);
+        participants.delete(userId);
+         updateCanvasLayout();
+        console.log(`${userId} video removed.`)
     }
 }
 
+// UPDATE CANVAS LAYOUT
+function updateCanvasLayout() {
+  const totalParticipants = participants.size + 1;
+  const cols = Math.ceil(Math.sqrt(totalParticipants));
+  const rows = Math.ceil(totalParticipants / cols);
+
+  canvas.width = cols * 320;
+  canvas.height = rows * 240;
+
+  let index = 0;
+  stream.renderVideo(canvas, client.getCurrentUserInfo().userId, 320, 240, 0, 0, 2);
+  index ++;
+  for (const [userId, video] of participants){
+    const col = index % cols;
+    const row = Math.floor(index / cols);
+
+    const x = col * 320;
+    const y = row * 240;
+
+    stream.renderVideo(canvas, userId, 320, 240, x, y, 2);
+    participants.set(userId, {x, y, width:320, height:240});
+
+    index++;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////
 // WAIT FOR DECODERS

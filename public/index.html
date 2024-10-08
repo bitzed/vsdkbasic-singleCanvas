@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <title>VideoSDK CDN Web Sample</title>
     <style>
-    .video-canvas {
-      background: rgba(0, 0, 0, 1);
-      margin: 1px;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, 1);
+    #videoCanvas {
+        background: rgb(221, 221, 221);
+        border: 1px solid #373737;
+        display:block;
+        width: 1280px;
+        height: 720px;
     }
     </style>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -38,14 +39,10 @@
   </p>
 </div>
 <div id="buttons-and-canvas" class="main" style="display:block;width:74%;height:100%;overflow:scroll;float:right;">
-<p>Self Video:</p>
-<video id="self-video-videotag" class="video-canvas" width="1280" height="720" style="background-color:gray; height:360px; width:640px;"></video>
-<br />
-<p>Far Video:</p>
-<canvas id="far-video-canvas" class="video-canvas" width="1280" height="720" style="background-color:gray; height:360px; width:640px;"></canvas>
+  <canvas id="videoCanvas"></canvas>
 </div>
-
-  <script src="https://source.zoom.us/videosdk/zoom-video-1.8.2.min.js"></script>
+  
+  <script src="https://source.zoom.us/videosdk/zoom-video-1.12.5.min.js"></script>
   <script src="./js/index.js"></script>
 
 </body>

@@ -1,7 +1,7 @@
 {
     "name": "vsdk-basic-sample",
     "version": "1.5.5",
-    "description": "VideoSDK Basic Web Sample",
+    "description": "VideoSDK Basic Single Canvas Sample",
     "main": "index.js",
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
