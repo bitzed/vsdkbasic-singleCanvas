@@ -10,6 +10,12 @@
         width: 1280px;
         height: 720px;
     }
+    #test{
+        border: 1px solid #373737;
+        display:block;
+        width: 1280px;
+        height: 1440px;       
+    }
     </style>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -37,8 +43,9 @@
     <button type="button" class="btn btn-secondary" id="leave-button">Leave(End) the Session</button>
   </p>
 </div>
-<div id="buttons-and-canvas" class="main" style="display:block;width:74%;height:100%;overflow:scroll;float:right;">
+<div id="buttons-and-canvas" class="main" style="display:block;overflow:scroll;float:right;">
   <canvas id="videoCanvas"></canvas>
+  <canvas id="test" width="1280" height="1440"></canvas>
 </div>
   
   <script src="https://source.zoom.us/videosdk/zoom-video-1.12.5.min.js"></script>

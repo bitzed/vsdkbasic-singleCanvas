@@ -146,45 +146,57 @@ async function audioStart() {
   }
 }
 
+let testCanvas = document.getElementById('test');/////////////////adding testing canvas for rendering far video only
+
 //LOCAL CAMERA START STOP
 async function toggleNearVideo() {
-  await stream.startVideo();
+  await stream.startVideo({ hd: true });
   let isVideoOn = await stream.isCapturingVideo()
   console.log("[DEBUG]cameraStartStop isCapturingVideo: " + isVideoOn)  
   var selfId = client.getCurrentUserInfo().userId;
   console.log("[DEBUG]selfId: ", selfId)
   if(isVideoOn){
-    await stream.renderVideo(canvas, selfId, 320, 240, 0, 0, 2)
-      .then(() => {
-        updateCanvasLayout();
-      });
+    await stream.renderVideo(
+      testCanvas, 
+      selfId, 
+      1280,
+      720, 
+      0, 
+      0, 
+      3)
+      //.then(() => { /////////////////////////////////////////////////removing update canvas layout for testing
+        //console.log('[DEBUG] start update canvas layout.')
+        //updateCanvasLayout();
+      //});
   }else{
     await stream.stopRenderVideo(canvas, selfId);
     isVideoOn = false
   }
 }
 
-
 //TOGGLE FAR END VIDEO ON CANVAS
 const toggleFarVideo = async (stream, userId, isVideoOn) => {
     if (isVideoOn) {
         await stream.renderVideo(
-            canvas,
+            testCanvas,///////////////////////////////////////////changed here to test canvas now
             userId,
-            320,  // Size Width
-            240,  // Size Height
-            0,      // Starting point x (Vertical : 横)
-            0,     // Starting point y (Horizon : 縦)
-            2       // Video Quality 0:90p, 1:180p, 2:360p, 3:720p
+            1280,  // Size Width
+            720,  // Size Height
+            0,      // Starting point x Vertical
+            720,     // Starting point y Horizon
+            3       // Video Quality 0:90p, 1:180p, 2:360p, 3:720p
         ).then(() => {
-          participants.set(userId, {x:0,y:0,width:320,height:240});
-          updateCanvasLayout();
+          participants.set(userId, {x:0,y:0,width:640,height:360});
+          //updateCanvasLayout();//////////////////////////////////removing update canvas layout for testing
+          //console.log('[DEBUG] start update canvas layout.')
         });
         console.log(`${userId} video rendered.`)
     } else {
-        await stream.stopRenderVideo(canvas, userId);
-        participants.delete(userId);
-         updateCanvasLayout();
+        await stream.stopRenderVideo(testCanvas, userId);
+        //clear canvas and re render all participants
+        testCanvas.clearRect(0, 0, testCanvas.width, 720);
+        //participants.delete(userId);
+         //updateCanvasLayout();
         console.log(`${userId} video removed.`)
     }
 }
@@ -195,21 +207,22 @@ function updateCanvasLayout() {
   const cols = Math.ceil(Math.sqrt(totalParticipants));
   const rows = Math.ceil(totalParticipants / cols);
 
-  canvas.width = cols * 320;
-  canvas.height = rows * 240;
+  canvas.width = cols * 640;
+  canvas.height = rows * 360;
 
   let index = 0;
-  stream.renderVideo(canvas, client.getCurrentUserInfo().userId, 320, 240, 0, 0, 2);
+  console.log('[DEBUG] updating canvas layout for SELF.')
+  stream.renderVideo(canvas, client.getCurrentUserInfo().userId, 640, 360, 0, 0, 2);
   index ++;
   for (const [userId, video] of participants){
     const col = index % cols;
     const row = Math.floor(index / cols);
 
-    const x = col * 320;
-    const y = row * 240;
-
-    stream.renderVideo(canvas, userId, 320, 240, x, y, 2);
-    participants.set(userId, {x, y, width:320, height:240});
+    const x = col * 640;
+    const y = row * 360;
+    console.log('[DEBUG] updating canvas layout for REMOTE.')
+    stream.renderVideo(canvas, userId, 640, 360, x, y, 2);
+    participants.set(userId, {x, y, width:640, height:360});
 
     index++;
   }
