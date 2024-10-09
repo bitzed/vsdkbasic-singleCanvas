@@ -4,17 +4,11 @@
     <meta charset="utf-8">
     <title>VideoSDK CDN Web Sample</title>
     <style>
-    #videoCanvas {
-        border: 1px solid #373737;
-        display:block;
-        width: 1280px;
-        height: 720px;
-    }
     #test{
         border: 1px solid #373737;
         display:block;
-        width: 1280px;
-        height: 1440px;       
+        width: 640px;
+        height: 720px;       
     }
     </style>
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -43,9 +37,8 @@
     <button type="button" class="btn btn-secondary" id="leave-button">Leave(End) the Session</button>
   </p>
 </div>
-<div id="buttons-and-canvas" class="main" style="display:block;overflow:scroll;float:right;">
-  <canvas id="videoCanvas"></canvas>
-  <canvas id="test" width="1280" height="1440"></canvas>
+<div id="buttons-and-canvas" class="main" style="display:block;overflow:scroll;float:left;">
+  <canvas id="test" width="640" height="720"></canvas>
 </div>
   
   <script src="https://source.zoom.us/videosdk/zoom-video-1.12.5.min.js"></script>
