@@ -148,12 +148,12 @@ async function audioStart() {
 
 //LOCAL CAMERA START STOP
 async function toggleNearVideo() {
+  await stream.startVideo();
   let isVideoOn = await stream.isCapturingVideo()
   console.log("[DEBUG]cameraStartStop isCapturingVideo: " + isVideoOn)  
   var selfId = client.getCurrentUserInfo().userId;
   console.log("[DEBUG]selfId: ", selfId)
   if(isVideoOn){
-    stream.startVideo();
     await stream.renderVideo(canvas, selfId, 320, 240, 0, 0, 2)
       .then(() => {
         updateCanvasLayout();
